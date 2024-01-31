@@ -14,6 +14,7 @@ class _MyAppState extends State<MyApp> with RouterMixin {
     return MaterialApp.router(
       routerConfig: router,
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
