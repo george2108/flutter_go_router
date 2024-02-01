@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_router_flutter/global/session_controller.dart';
-import 'package:go_router_flutter/pages/details.dart';
-import 'package:go_router_flutter/pages/home.dart';
+import 'package:go_router_flutter/pages/home/details.dart';
+import 'package:go_router_flutter/pages/home/home.dart';
+import 'package:go_router_flutter/pages/home/scaffold.dart';
 import 'package:go_router_flutter/pages/my_app.dart';
 import 'package:go_router_flutter/pages/not_found.dart';
 import 'package:go_router_flutter/pages/profile.dart';
@@ -20,11 +21,30 @@ mixin RouterMixin on State<MyApp> {
       );
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) {
-          return const HomePage();
+      ShellRoute(
+        builder: (context, state, child) {
+          return ScaffoldPage(child: child);
         },
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) {
+              return const HomePage();
+            },
+          ),
+          GoRoute(
+            path: '/detail/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return DetailsPage(id: int.parse(id));
+            },
+            redirect: (context, state) => authGuard(
+              context: context,
+              state: state,
+              redirectUrl: '/detail/${state.pathParameters['id']}',
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: '/profile',
@@ -55,18 +75,6 @@ mixin RouterMixin on State<MyApp> {
 
           return null;
         },
-      ),
-      GoRoute(
-        path: '/detail/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return DetailsPage(id: int.parse(id));
-        },
-        redirect: (context, state) => authGuard(
-          context: context,
-          state: state,
-          redirectUrl: '/detail/${state.pathParameters['id']}',
-        ),
       ),
     ],
   );
