@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:go_router_flutter/global/session_controller.dart';
@@ -31,19 +33,19 @@ mixin RouterMixin on State<MyApp> {
         },
         // sirve para hacer evaluaciones si queremos comprobar algo antes de ejecutar la ruta
         // como los guards de angular
-        redirect: (context, state) async {
-          final signedId = context.read<SessionController>().isSignedIn;
-          if (signedId) {
-            return null;
-          }
-
-          return '/sign-in';
-        },
+        redirect: (context, state) => authGuard(
+          context: context,
+          state: state,
+          redirectUrl: '/profile',
+        ),
       ),
       GoRoute(
         path: '/sign-in',
         builder: (context, state) {
-          return const SignInPage();
+          final redirectUrl = state.uri.queryParameters['redirectUrl'];
+          return SignInPage(
+            redirectUrl: redirectUrl ?? '/',
+          );
         },
         redirect: (context, state) {
           final signedId = context.read<SessionController>().isSignedIn;
@@ -60,9 +62,27 @@ mixin RouterMixin on State<MyApp> {
           final id = state.pathParameters['id']!;
           return DetailsPage(id: int.parse(id));
         },
+        redirect: (context, state) => authGuard(
+          context: context,
+          state: state,
+          redirectUrl: '/detail/${state.pathParameters['id']}',
+        ),
       ),
     ],
   );
 
   GoRouter get router => _router;
+}
+
+FutureOr<String?> authGuard({
+  required BuildContext context,
+  required GoRouterState state,
+  required String redirectUrl,
+}) async {
+  final signedId = context.read<SessionController>().isSignedIn;
+  if (signedId) {
+    return null;
+  }
+
+  return '/sign-in?redirectUrl=$redirectUrl';
 }

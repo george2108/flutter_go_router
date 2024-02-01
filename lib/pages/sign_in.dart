@@ -4,7 +4,9 @@ import 'package:go_router_flutter/global/session_controller.dart';
 import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+  final String redirectUrl;
+
+  const SignInPage({super.key, required this.redirectUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class SignInPage extends StatelessWidget {
           child: const Text('Iniciar sesión'),
           onPressed: () {
             context.read<SessionController>().setSignedIn(true);
-            GoRouter.of(context).pushReplacement('/');
+            GoRouter.of(context).pushReplacement(redirectUrl);
           },
         ),
       ),
